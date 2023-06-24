@@ -1,40 +1,52 @@
-import tkinter as tk
 import pandas as pd
-import matplotlib.pyplot as plt
+import tkinter as tk
+from tkinter import filedialog
+from tkinter import ttk
 
-# Create a DataFrame
-data = {
-    'Name': ['John', 'Emma', 'Tom', 'Lisa', 'Mike'],
-    'Age': [25, 28, 31, 27, 35],
-    'Salary': [50000, 60000, 70000, 55000, 80000]
-}
-df = pd.DataFrame(data)
+def upload_file():
+    file_types = [('CSV files', '*.csv'), ('All Files', '*.*')]
+    file_path = filedialog.askopenfilename(filetypes=file_types)
+    
+    if file_path:
+        df = pd.read_csv(file_path)  # Read the CSV file and create a DataFrame
+        display_dataframe(df)  # Display the DataFrame in the Treeview
 
-# Create a file using pandas
-df.to_csv('data.csv', index=False)
+def display_dataframe(df):
+    clear_treeview()
+    rows, columns = df.shape
+    lb2.config(text=f"Rows: {rows}, Columns: {columns}")
+    
+    header_labels = list(df.columns)
+    trv["columns"] = header_labels
+    
+    for i, header in enumerate(header_labels):
+        trv.heading(header, text=header)
+        trv.column(header, width=50, anchor=tk.CENTER)
+    
+    for index, row in df.iterrows():
+        trv.insert("", tk.END, text=index, values=list(row))
+        
+def clear_treeview():
+    trv.delete(*trv.get_children())
 
-# Create a tkinter window
+# Create the main Tkinter window
 window = tk.Tk()
-window.title("Data Visualization")
+window.title("CSV File Reader")
+window.geometry("500x350")
 
-# Read the data from the CSV file
-data = pd.read_csv('data.csv')
+# Create and place the "Browse File" button
+btn_browse = tk.Button(window, text="Browse File", command=upload_file)
+btn_browse.pack(pady=10)
 
-# Create a bar plot using matplotlib
-plt.bar(data['Name'], data['Salary'])
-plt.xlabel('Name')
-plt.ylabel('Salary')
-plt.title('Employee Salaries')
+# Create and place the label for displaying the DataFrame dimensions
+lb2 = tk.Label(window, text="")
+lb2.pack()
 
-# Display the plot using tkinter
-canvas = tk.Canvas(window, width=400, height=300)
-canvas.pack()
-canvas.draw()
-figure = plt.gcf()
-figure.set_size_inches(6, 4)
-figure_canvas_agg = FigureCanvasAgg(figure)
-figure_canvas_agg.draw()
-figure_canvas_agg.get_tk_widget().pack()
+# Create the Treeview widget
+style = ttk.Style()
+style.configure("Treeview", borderwidth=100)  # Remove the default border
+trv = ttk.Treeview(window, style="Treeview", show="headings")
+trv.pack(padx=10, pady=(0, 10))
 
-# Run the tkinter event loop
+# Run the Tkinter event loop
 window.mainloop()
