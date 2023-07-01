@@ -1,10 +1,11 @@
-from tkinter import messagebox
-import pandas as pd
 import tkinter as tk
 import tkinter.ttk as ttk
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import filedialog
 from PIL import ImageTk, Image
+from tkinter import messagebox
+import pandas as pd
 
 def upload_file():
     file_types = [('CSV files', '*.csv'), ('All Files', '*.*')]
@@ -20,8 +21,8 @@ def display_dataframe(df):
     lb2.config(text=f"Rows: {rows}, Columns: {columns}")
     
     header_labels = list(df.columns)
-    trv["columns"] = header_labels
-    
+    trv["columns"] = tuple(header_labels)
+
     for i, header in enumerate(header_labels):
         trv.heading(header, text=header)
         trv.column(header, width=50, anchor=tk.CENTER)
@@ -42,31 +43,33 @@ def create_chart():
     selected_items = trv.selection()
     if len(selected_items) == 1:
         selected_item = selected_items[0]
-        selected_row = trv.item(selected_item)["text"]
-        selected_columns = trv.item(selected_item)["values"]
-        if selected_row and selected_columns:
-            chart_type = combo_chart.get()
-            if chart_type == "Line":
-                x = list(selected_columns)
-                y = []
-
-                for value in x:
-                    try:
-                        y_value = int(value)
-                        y.append(y_value)
-                    except ValueError:
-                        pass
-
-          
-                if len(x) != len(y):
-                    messagebox.showerror("Error", "Invalid data for line plot")
-                    return
-
-                plt.plot(x, y)
-                plt.xlabel("Columns")
+        selected_row = trv.item(selected_item)["values"]
+        
+        if selected_row:
+            datetime_utc = selected_row[0]
+            timezone_minutes = selected_row[1]
+            firmware_version = selected_row[2]
+            app_version = selected_row[4]
+            mobile_os_version = selected_row[6]
+            gtcs_algorithm_version = selected_row[7]
+            
+            if datetime_utc and timezone_minutes and firmware_version and app_version and mobile_os_version and gtcs_algorithm_version:
+                
+                x = ["Timezone", "Firmware Version", "App Version", "Mobile OS Version", "GTCS Algorithm Version"]
+                y = [str(timezone_minutes), firmware_version, app_version, mobile_os_version, gtcs_algorithm_version]
+    
+                fig = plt.figure(figsize=(10, 6), dpi=150)
+                plt.bar(x, y, color='blue')
+    
+                plt.xlabel("Attributes")
                 plt.ylabel("Values")
-                plt.title("Line Plot")
-                plt.show()
+                plt.title("Device Information")
+                plt.grid(True)
+    
+                # Create a FigureCanvasTkAgg object and embed the figure in the Tkinter window
+                canvas = FigureCanvasTkAgg(fig, master=window)
+                canvas.draw()
+                canvas.get_tk_widget().pack()
 
 # Create the main Tkinter window
 window = tk.Tk()
