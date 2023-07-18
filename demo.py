@@ -10,7 +10,9 @@ import Chart
 from tkinter import *
 import datetime
 
+
 df = None  # Establishing global dataframe variable
+
 
 def upload_file():
     global df
@@ -18,17 +20,21 @@ def upload_file():
     file_path = filedialog.askopenfilename(filetypes=file_types)
 
     if file_path:
-        df = pd.read_csv(file_path, parse_dates=['Datetime (UTC)'],
-                         date_parser=lambda x: pd.to_datetime(x, format='%Y-%m-%dT%H:%M:%SZ'))
-        # display_dataframe()
+        df = pd.read_csv(
+            file_path,
+            parse_dates=['Datetime (UTC)'],
+            date_parser=lambda x: pd.to_datetime(x, format='%Y-%m-%dT%H:%M:%SZ')
+        )
         combo_datastream["values"] = list(df.columns)[3:]  # Populating datastream combobox
         combo_datastream.current(0)  # Setting default datastream combobox value
         btn_chart["state"] = "normal"  # Enabling create chart button
         btn_clear["state"] = "normal"  # Enabling clear participant button
 
+
 def destroy_charts():
     for widget in chart_space.winfo_children():
         widget.destroy()
+
 
 def clear_participant():
     destroy_charts()
@@ -37,48 +43,85 @@ def clear_participant():
     combo_datastream["values"] = ""
     combo_datastream.set('')
 
+
 def create_chart():
     global df
 
     df['Datetime'] = df['Datetime (UTC)'].dt.tz_localize('UTC')
 
     if combo_time.get() == "UTC":
-        chart = Chart.chart(combo_chart.get(), df['Datetime (UTC)'], df[combo_datastream.get()])
-        chart.display(chart_space)
+        chart = Chart.chart(
+            combo_chart.get(),
+            df['Datetime (UTC)'],
+            df[combo_datastream.get()],
+            combo_datastream.get()
+        )
+        chart.display(chart_space, sidebar)
 
     elif combo_time.get() == "US Eastern":
         df['time'] = df['Datetime'].dt.tz_convert('US/Eastern')
-        chart = Chart.chart(combo_chart.get(), df['time'], df[combo_datastream.get()])
-        chart.display(chart_space)
+        chart = Chart.chart(
+            combo_chart.get(),
+            df['time'],
+            df[combo_datastream.get()],
+            combo_datastream.get()
+        )
+        chart.display(chart_space, sidebar)
 
     elif combo_time.get() == "US Mountain":
         df['time'] = df['Datetime'].dt.tz_convert('US/Mountain')
-        chart = Chart.chart(combo_chart.get(), df['time'], df[combo_datastream.get()])
-        chart.display(chart_space)
+        chart = Chart.chart(
+            combo_chart.get(),
+            df['time'],
+            df[combo_datastream.get()],
+            combo_datastream.get()
+        )
+        chart.display(chart_space, sidebar)
 
     elif combo_time.get() == "US Central":
         df['time'] = df['Datetime'].dt.tz_convert('US/Central')
-        chart = Chart.chart(combo_chart.get(), df['time'], df[combo_datastream.get()])
-        chart.display(chart_space)
+        chart = Chart.chart(
+            combo_chart.get(),
+            df['time'],
+            df[combo_datastream.get()],
+            combo_datastream.get()
+        )
+        chart.display(chart_space, sidebar)
 
     elif combo_time.get() == "US Alanskan":
         df['time'] = df['Datetime'].dt.tz_convert('US/Alaska')
-        chart = Chart.chart(combo_chart.get(), df['time'], df[combo_datastream.get()])
-        chart.display(chart_space)
+        chart = Chart.chart(
+            combo_chart.get(),
+            df['time'],
+            df[combo_datastream.get()],
+            combo_datastream.get()
+        )
+        chart.display(chart_space, sidebar)
 
     elif combo_time.get() == "US Pacific":
         df['time'] = df['Datetime'].dt.tz_convert('US/Pacific')
-        chart = Chart.chart(combo_chart.get(), df['time'], df[combo_datastream.get()])
-        chart.display(chart_space)
+        chart = Chart.chart(
+            combo_chart.get(),
+            df['time'],
+            df[combo_datastream.get()],
+            combo_datastream.get()
+        )
+        chart.display(chart_space, sidebar)
 
     elif combo_time.get() == "US Hawaiian":
         df['time'] = df['Datetime'].dt.tz_convert('US/Hawaii')
-        chart = Chart.chart(combo_chart.get(), df['time'], df[combo_datastream.get()])
-        chart.display(chart_space)
+        chart = Chart.chart(
+            combo_chart.get(),
+            df['time'],
+            df[combo_datastream.get()],
+            combo_datastream.get()
+        )
+        chart.display(chart_space, sidebar)
+
 
 window = tk.Tk()
 window.title("CSV File Reader")
-window.geometry("1540x820")
+window.geometry("1920x1080")
 
 sidebar = tk.Frame(window)
 sidebar.pack(side="left", fill="y")
@@ -100,9 +143,6 @@ btn_clear.pack()
 
 btn_chart = tk.Button(sidebar, text="Create Chart", command=create_chart, height=2, width=20, bg='lightgreen', state="disabled")
 btn_chart.pack()
-
-style = ttk.Style()
-style.configure("Treeview", borderwidth=100)
 
 combo_chart = ttk.Combobox(sidebar, values=["Line", "Bar", "Scatter"])
 combo_chart.current(0)  # Set default value to "Line"
