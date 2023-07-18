@@ -78,7 +78,7 @@ def create_chart():
 
 window = tk.Tk()
 window.title("CSV File Reader")
-window.geometry("1920x1080")
+window.geometry("1540x820")
 
 sidebar = tk.Frame(window)
 sidebar.pack(side="left", fill="y")
