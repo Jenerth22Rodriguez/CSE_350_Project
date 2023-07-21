@@ -96,7 +96,7 @@ def update_combo_start_time(event):
 
 window = tk.Tk()
 window.title("CSV File Reader")
-window.geometry("1920x1080")
+window.geometry("1520x1080")
 
 sidebar = tk.Frame(window, background="light grey")
 sidebar.pack(side="left", fill="y")
@@ -152,3 +152,4 @@ style = ttk.Style()
 style.configure("Treeview", borderwidth=100)
 
 window.mainloop()
+
